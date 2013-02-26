@@ -10,14 +10,14 @@ class Markov(object):
   """docstring for ClassName"""
 
   def read(self, filename):
-    f = open(filename)
+    with open(filename) as f:
+      headlines = f.readlines()
 
-    entirefile = json.load(f)
+    # entirefile = json.load(f)
+    # headlines = [entry['title'] for entry in entirefile["items"]]
 
-    headlines = [entry['title'] for entry in entirefile["items"]]
-
-    headlines = map(unicode.lower, headlines) # TODO: keep proper nouns
-    headlines = map(unicode.strip, headlines)
+    headlines = map(str.lower, headlines) # TODO: keep proper nouns
+    headlines = map(str.strip, headlines)
     headlines = [re.split('\W+', headline) for headline in headlines] # TODO: fix regex
     for headline in headlines:
       if headline[-1] == '': del(headline[-1]) # EMBRACE THE JANK
@@ -53,7 +53,7 @@ class Markov(object):
       self.matrix.setdefault(prev_word, collections.defaultdict(int))
       self.matrix[prev_word][current_word] += 1
   
-  
+
   def generateNextWord(self, prev_word):
 
     conditional_words = self.matrix[prev_word]
@@ -67,10 +67,10 @@ class Markov(object):
         return words[index]
 
 
-  def generateParagraph(self, seed_word='^'):
+  def generateParagraph(self, seed_word='why'):
     
     current_word = seed_word
-    paragraph = []
+    paragraph = ['why']
     while (current_word != '$' and len(paragraph) < 20): # TODO: more graceful ending
       paragraph.append(current_word)
       current_word = self.generateNextWord(current_word)
@@ -87,19 +87,17 @@ class Markov(object):
 
 def main():
 
-  if len(sys.argv) != 2:
-    print 'usage: ./markov.py file'
+  if len(sys.argv) != 3:
+    print 'usage: ./markov.py file num'
     sys.exit(1)
 
   filename = sys.argv[1]
-
-  if not filename.endswith(".json"):
-    print 'error: need json file'
-    sys.exit(1)
   
   m = Markov()
   m.generateMatrix(filename)
-  print m.generateParagraph()
+  for i in xrange(int(sys.argv[2])):
+    print m.generateParagraph('how')
+    print m.generateParagraph('why')
 
 if __name__ == '__main__':
   main()
