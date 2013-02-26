@@ -16,14 +16,21 @@ class Markov(object):
 
     headlines = map(unicode.lower, headlines) # TODO: keep proper nouns
     headlines = map(unicode.strip, headlines)
-
     headlines = [re.split('\W+', headline) for headline in headlines]
-
     headlines = [['^'] + headline + ['$'] for headline in headlines]
 
     return headlines
 
-  def generateMatrix():
+  def generateBigrams(self, tokens):
+
+
+  def generateMatrix(self, filename):
+    
+    headlines = self.read(filename)
+
+    for headline in headlines
+
+    # read in headlines, generate tuples
 
 
   def generateText(self):
@@ -45,10 +52,7 @@ def main():
 
   
   m = Markov()
-  m.read(filename)
-  '''
-  m.generate()
-  '''
+  m.generateMatrix(filename)
 
 if __name__ == '__main__':
   main()
