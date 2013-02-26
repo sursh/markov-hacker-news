@@ -50,16 +50,28 @@ class Markov(object):
     '''
     for prev_word, current_word in bigrams:
       self.matrix.setdefault(prev_word, collections.defaultdict(int))
-      
       self.matrix[prev_word][current_word] += 1
 
-      #print '%r %r' % (prev_word, current_word)
+  def generateNextWord(self, prev_word):
+    
 
-  def generateText(self):
-    pass
+  def generateParagraph(self, seed_word='^'):
+    
+    current_word = seed_word
+    paragraph = []
+    while current_word != '$':
+      paragraph.append(current_word)
+      current_word = self.generateNextWord(current_word)
+
+    return ' '.join(paragraph[1:]) # strip off carrot
+
 
   def __str__(self):
-    return str(self.matrix)
+    s = ''
+    for word, cfd in self.matrix.iteritems():
+      for word2, count in cfd.iteritems():
+        s += '%s %s: %d\n' % (word, word2, count)
+    return s
 
 def main():
 
@@ -72,10 +84,10 @@ def main():
   if not filename.endswith(".json"):
     print 'error: need json file'
     sys.exit(1)
-
   
   m = Markov()
   m.generateMatrix(filename)
+  print m.generateParagraph()
 
 if __name__ == '__main__':
   main()
