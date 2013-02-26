@@ -4,6 +4,7 @@ import sys
 import json
 import re
 import collections
+import numpy
 
 class Markov(object):
   """docstring for ClassName"""
@@ -51,19 +52,33 @@ class Markov(object):
     for prev_word, current_word in bigrams:
       self.matrix.setdefault(prev_word, collections.defaultdict(int))
       self.matrix[prev_word][current_word] += 1
+  
+  ''' take in prev_word, refer to bigram chart, according to probability, 
+      pick a second word, and return it.
 
+  '''
   def generateNextWord(self, prev_word):
-    
+
+    conditional_words = self.matrix[prev_word]
+    words, counts = zip(*conditional_words.items())
+    cumcounts = numpy.cumsum(counts)
+
+    coin = numpy.random.randint(cumcounts[-1])
+
+    for index, item in enumerate(cumcounts): 
+      if item > coin: 
+        return words[index]
+
 
   def generateParagraph(self, seed_word='^'):
     
     current_word = seed_word
     paragraph = []
-    while current_word != '$':
+    while (current_word != '$' and len(paragraph) < 20): # TODO: more graceful ending
       paragraph.append(current_word)
       current_word = self.generateNextWord(current_word)
 
-    return ' '.join(paragraph[1:]) # strip off carrot
+    return ' '.join(paragraph[1:]) # strip off caret
 
 
   def __str__(self):
