@@ -53,10 +53,7 @@ class Markov(object):
       self.matrix.setdefault(prev_word, collections.defaultdict(int))
       self.matrix[prev_word][current_word] += 1
   
-  ''' take in prev_word, refer to bigram chart, according to probability, 
-      pick a second word, and return it.
-
-  '''
+  
   def generateNextWord(self, prev_word):
 
     conditional_words = self.matrix[prev_word]
