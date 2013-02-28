@@ -12,7 +12,7 @@ class Markov(object):
     with open(filename) as f:
       headlines = f.readlines()
 
-    headlines = map(str.lower, headlines) # TODO: keep proper nouns
+    headlines = map(str.lower, headlines)
     headlines = map(str.strip, headlines)
     headlines = [re.split('\W+', headline) for headline in headlines] # TODO: fix regex
     for headline in headlines:
@@ -75,7 +75,9 @@ class Markov(object):
       paragraph.append(current_word)
       prev_word, current_word = current_word, self.generateNextWord( prev_word, current_word )
 
-    return ' '.join(paragraph[1:]) # strip off caret
+
+    paragraph = ' '.join(paragraph[1:])  # strip off leadig caret
+    return paragraph.title()
 
 
   def __str__(self):
