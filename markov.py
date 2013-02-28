@@ -7,14 +7,10 @@ import collections
 import numpy
 
 class Markov(object):
-  """docstring for ClassName"""
 
   def read(self, filename):
     with open(filename) as f:
       headlines = f.readlines()
-
-    # entirefile = json.load(f)
-    # headlines = [entry['title'] for entry in entirefile["items"]]
 
     headlines = map(str.lower, headlines) # TODO: keep proper nouns
     headlines = map(str.strip, headlines)
@@ -26,54 +22,58 @@ class Markov(object):
 
     return headlines
 
-  def generateBigrams(self, tokens):
+  def generateTrigrams(self, tokens):
+    ''' Create a list of tuples, where each tuple is a trigram '''
     grams = []
-    for idx, item in enumerate(tokens[:-1]):
-      grams.append((item, tokens[idx+1]))
+    for idx, item in enumerate(tokens[:-2]):
+      grams.append((item, tokens[idx+1], tokens[idx+2]))
     return grams
 
   def generateMatrix(self, filename):
-    # read in headlines, generate tuples
+    ''' Run through the list of trigrams and add them to the occurence matrix '''
 
-    # initializes a 2D dictionary with default values of 0
     self.matrix = {} 
 
     headlines = self.read(filename)
 
     for headline in headlines:
-      bigrams = self.generateBigrams(headline)
-      self.updateMatrix(bigrams)
+      trigrams = self.generateTrigrams(headline)
+      self.updateMatrix(trigrams)
 
 
-  def updateMatrix(self, bigrams):
-    '''Take a list of (w1, w2) bigrams
-    and updates the counts stored of count of word2 following word1
+  def updateMatrix(self, trigrams):
     '''
-    for prev_word, current_word in bigrams:
-      self.matrix.setdefault(prev_word, collections.defaultdict(int))
-      self.matrix[prev_word][current_word] += 1
-  
+    Take a list of (w1, w2, w3) trigrams
+    and updates the counts stored of count of word1 followed by word2, word3
+    '''
 
-  def generateNextWord(self, prev_word):
+    for first_word, second_word, third_word in trigrams:
+      self.matrix.setdefault( (first_word, second_word), collections.defaultdict(int)) 
+      self.matrix[(first_word, second_word)][third_word] += 1
 
-    conditional_words = self.matrix[prev_word]
+
+  def generateNextWord(self, prev_word, current_word):
+
+    conditional_words = self.matrix[ (prev_word, current_word) ]
     words, counts = zip(*conditional_words.items())
+
+    # pick one of the possibilities, with probability weighted by frequency in training corpus
     cumcounts = numpy.cumsum(counts)
-
     coin = numpy.random.randint(cumcounts[-1])
-
-    for index, item in enumerate(cumcounts): 
-      if item > coin: 
+    for index, item in enumerate(cumcounts):
+      if item > coin:
         return words[index]
 
 
-  def generateParagraph(self, seed_word='why'):
+  def generateParagraph(self, seed2 = 'i', seed1 = '^',):
     
-    current_word = seed_word
-    paragraph = ['why']
+    prev_word = seed1
+    current_word = seed2
+    paragraph = [ seed1 ]
+
     while (current_word != '$' and len(paragraph) < 20): # TODO: more graceful ending
       paragraph.append(current_word)
-      current_word = self.generateNextWord(current_word)
+      prev_word, current_word = current_word, self.generateNextWord( prev_word, current_word )
 
     return ' '.join(paragraph[1:]) # strip off caret
 
@@ -88,7 +88,7 @@ class Markov(object):
 def main():
 
   if len(sys.argv) != 3:
-    print 'usage: ./markov.py file num'
+    print 'usage: ./markov.py inputFile numOfResults'
     sys.exit(1)
 
   filename = sys.argv[1]
