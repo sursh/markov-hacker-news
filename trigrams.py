@@ -17,6 +17,7 @@ class Markov(object):
     headlines = [re.split('\W+', headline) for headline in headlines] # TODO: fix regex
     for headline in headlines:
       if headline[-1] == '': del(headline[-1]) # EMBRACE THE JANK
+      if headline[0] == '': del(headline[0])
 
     headlines = [['^'] + headline + ['$'] for headline in headlines]
 
