@@ -5,6 +5,7 @@ import json
 import re
 import collections
 import numpy
+import string
 
 class Markov(object):
 
@@ -14,9 +15,9 @@ class Markov(object):
 
     headlines = map(str.lower, headlines)
     headlines = map(str.strip, headlines)
-    headlines = [re.split('\W+', headline) for headline in headlines] # TODO: fix regex
+    headlines = [re.split('\s+', headline) for headline in headlines]
     for headline in headlines:
-      if headline[-1] == '': del(headline[-1]) # EMBRACE THE JANK
+      if headline[-1] == '': del(headline[-1]) # clear lingering null entries
       if headline[0] == '': del(headline[0])
 
     headlines = [['^'] + headline + ['$'] for headline in headlines]
@@ -40,7 +41,7 @@ class Markov(object):
     for headline in headlines:
 
       trigrams = self.generateTrigrams(headline)
-      
+
       for first_word, second_word, third_word in trigrams:
         self.matrix.setdefault( (first_word, second_word), collections.defaultdict(int)) 
         self.matrix[(first_word, second_word)][third_word] += 1
@@ -69,9 +70,9 @@ class Markov(object):
       paragraph.append(current_word)
       prev_word, current_word = current_word, self.generateNextWord( prev_word, current_word )
 
-
+    
     paragraph = ' '.join(paragraph[1:])  # strip off leadig caret
-    return paragraph.title()
+    return string.capwords(paragraph)
 
 
   def __str__(self):
