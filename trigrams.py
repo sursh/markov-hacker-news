@@ -33,24 +33,17 @@ class Markov(object):
   def generateMatrix(self, filename):
     ''' Run through the list of trigrams and add them to the occurence matrix '''
 
-    self.matrix = {} 
+    self.matrix = {}
 
     headlines = self.read(filename)
 
     for headline in headlines:
+
       trigrams = self.generateTrigrams(headline)
-      self.updateMatrix(trigrams)
-
-
-  def updateMatrix(self, trigrams):
-    '''
-    Take a list of (w1, w2, w3) trigrams
-    and updates the counts stored of count of word1 followed by word2, word3
-    '''
-
-    for first_word, second_word, third_word in trigrams:
-      self.matrix.setdefault( (first_word, second_word), collections.defaultdict(int)) 
-      self.matrix[(first_word, second_word)][third_word] += 1
+      
+      for first_word, second_word, third_word in trigrams:
+        self.matrix.setdefault( (first_word, second_word), collections.defaultdict(int)) 
+        self.matrix[(first_word, second_word)][third_word] += 1
 
 
   def generateNextWord(self, prev_word, current_word):
