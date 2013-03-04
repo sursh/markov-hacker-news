@@ -6,6 +6,7 @@ import re
 import collections
 import numpy
 import string
+import cPickle as pickle
 
 class Markov(object):
 
@@ -36,16 +37,25 @@ class Markov(object):
 
     self.matrix = {}
 
-    headlines = self.read(filename)
+    try: # load as pickle
 
-    for headline in headlines:
+      with open('matrix.p', 'rb') as f:
+        self.matrix = pickle.load(f)
 
-      trigrams = self.generateTrigrams(headline)
+    except: # interpret file as newline separated headlines
 
-      for first_word, second_word, third_word in trigrams:
-        self.matrix.setdefault( (first_word, second_word), collections.defaultdict(int)) 
-        self.matrix[(first_word, second_word)][third_word] += 1
+      headlines = self.read(filename)
 
+      for headline in headlines:
+
+        trigrams = self.generateTrigrams(headline)
+
+        for first_word, second_word, third_word in trigrams:
+          self.matrix.setdefault( (first_word, second_word), collections.defaultdict(int)) 
+          self.matrix[(first_word, second_word)][third_word] += 1
+
+      print("DUMPING %d" % len(self.matrix))
+      pickle.dump(self.matrix, open("matrix.p", "wb"))
 
   def generateNextWord(self, prev_word, current_word):
 
@@ -71,7 +81,7 @@ class Markov(object):
       prev_word, current_word = current_word, self.generateNextWord( prev_word, current_word )
 
     
-    paragraph = ' '.join(paragraph[1:])  # strip off leadig caret
+    paragraph = ' '.join(paragraph[1:])  # strip off leading caret
     return string.capwords(paragraph)
 
 
@@ -92,6 +102,7 @@ def main():
   
   m = Markov()
   m.generateMatrix(filename)
+
   for i in xrange(int(sys.argv[2])):
     print m.generateParagraph('how')
     print m.generateParagraph('why')
