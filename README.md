@@ -7,19 +7,12 @@ TODO:
 - Set it to pick a common starting word for the first seed
 - [x] Recapitalize sentences before output
 - [x] Use pickle to only generate the matrix once
-- [ ] Turn into Twitter bot
-- [ ] Toward the end of a sentence, transition into bigrams instead of trigrams
-- [ ] (maybe) Use semantic analysis and language patterns
+- [x] Turn into Twitter bot with heroku
+- [x] fix length of tweets
+- [ ] add seed function
+- [ ] Implement real HN headlines
+- [ ] Implement check to make sure generated lines aren't coincidentally real ones
+- [ ] Toward the end of a sentence, transition into bigrams instead of trigrams (backoff)
+- [ ] Add links
 
 
-Tweeting through Buffer: 
-
-Host a script on Heroku and set up a cron job to run once a day and stuff four tweets into Buffer. (Want to use Oauth2, and constructing the matrix is very intensive)
-
-- create the twitter account
-- register a new application http://bufferapp.com/developers/apps/create
-
-
-http://bufferapp.com/developers/api/oauth
-
-http://bufferapp.com/developers/api/updates#updatescreate

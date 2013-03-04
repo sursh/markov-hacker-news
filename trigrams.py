@@ -7,6 +7,7 @@ import collections
 import numpy
 import string
 import cPickle as pickle
+import twitterclient
 
 class Markov(object):
 
@@ -76,7 +77,7 @@ class Markov(object):
     current_word = seed2
     paragraph = [ seed1 ]
 
-    while (current_word != '$' and len(paragraph) < 20): # TODO: more graceful ending
+    while (current_word != '$' and len(paragraph) < 20): 
       paragraph.append(current_word)
       prev_word, current_word = current_word, self.generateNextWord( prev_word, current_word )
 
@@ -94,8 +95,8 @@ class Markov(object):
 
 def main():
 
-  if len(sys.argv) != 3:
-    print 'usage: ./markov.py inputFile numOfResults'
+  if len(sys.argv) != 2:
+    print 'usage: ./markov.py inputFile'
     sys.exit(1)
 
   filename = sys.argv[1]
@@ -103,9 +104,13 @@ def main():
   m = Markov()
   m.generateMatrix(filename)
 
-  for i in xrange(int(sys.argv[2])):
-    print m.generateParagraph('how')
-    print m.generateParagraph('why')
+  while True:
+    tweet = m.generateParagraph('how') # todo: new seed
+    if len(tweet) < 120:
+      break
+
+  print("Tweeting %d" % tweet)
+  twitterclient.postTweet(tweet)
 
 if __name__ == '__main__':
   main()
