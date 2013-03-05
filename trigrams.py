@@ -5,7 +5,7 @@ from collections import defaultdict
 import numpy
 import string
 import cPickle as pickle
-import twitterclient
+#import twitterclient
 
 class Markov(object):
 
@@ -13,7 +13,7 @@ class Markov(object):
 
     with open(filename) as f:
       for line in f:
-        yield ['^'] + line.strip().lower().split() + ['$']
+        yield ['^', '^'] + line.strip().lower().split() + ['$']
 
 
   def generateTrigrams(self, tokens):
@@ -59,7 +59,7 @@ class Markov(object):
           self.matrix[trigram] = (1 + old_count, True)
 
       print("Pickling %d things" % len(self.matrix))
-      pickle.dump(self.matrix, open("matrix.pkl", "wb"))
+      #pickle.dump(self.matrix, open("matrix.pkl", "wb"))
 
 
   def generateNextWord(self, prev_word, current_word):
@@ -83,11 +83,14 @@ class Markov(object):
         return words[index]
 
 
-  def generateParagraph(self, seed2 = 'i', seed1 = '^',):
+  def generateParagraph(self, initial_word=None):
     
-    prev_word = seed1
-    current_word = seed2
-    paragraph = [ seed1 ]
+    if not initial_word:
+        initial_word = self.generateNextWord('^', '^')
+        
+    prev_word = '^'
+    current_word = initial_word
+    paragraph = [ initial_word ]
 
     while (current_word != '$' and len(paragraph) < 20): 
       paragraph.append(current_word)
@@ -110,10 +113,13 @@ def main():
 
   while True:
     tweet = m.generateParagraph('how') # todo: new seed
+    tweet2 = m.generateParagraph() # todo: no seed
     if len(tweet) < 120:
       break
 
   print("Tweeting: %s" % tweet)
+  print("no seed: %s" % tweet2)
+
   twitterclient.postTweet(tweet)
 
 if __name__ == '__main__':
