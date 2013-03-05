@@ -1,8 +1,6 @@
  #!/usr/bin/python -tt
 
 import sys
-import json
-import re
 from collections import defaultdict
 import numpy
 import string
@@ -15,24 +13,19 @@ class Markov(object):
 
     with open(filename) as f:
       for line in f:
-        yield line.strip().lower().split()
+        yield ['^'] + line.strip().lower().split() + ['$']
 
-    # headlines = [re.split('\s+', headline) for headline in headlines]
-    #for headline in headlines:
-    #  if headline[-1] == '': del(headline[-1]) # clear lingering null entries
-    #  if headline[0] == '': del(headline[0])
-
-    #headlines = [['^'] + headline + ['$'] for headline in headlines]
-
-    #return headlines
 
   def generateTrigrams(self, tokens):
-    ''' Create a list of tuples, where each tuple is a trigram '''
+    ''' Loop through the line and store each trigram as a tuple '''
 
     grams = []
+
     for idx, item in enumerate(tokens[:-2]):
       grams.append((item, tokens[idx+1], tokens[idx+2]))
+    
     return grams
+
 
   def generateMatrix(self, filename):
     ''' Run through the list of trigrams and add them to the occurence matrix '''
@@ -40,15 +33,15 @@ class Markov(object):
     self.matrix = {}
     self.bigrams = defaultdict(list)
 
-    try: # load matrix from pickle file
-      with open('matrix.p', 'rb') as f:
+    # load matrix from pickle file
+    try: 
+      with open('matrix.pkl', 'rb') as f:
         self.matrix = pickle.load(f)
 
-    except: # construct matrix from text file
+    # or, construct matrix from text file
+    except: 
 
       headlines = self.read(filename)
-
-      print "constructing matrix"
 
       for headline in headlines:
 
@@ -65,8 +58,9 @@ class Markov(object):
 
           self.matrix[trigram] = (1 + old_count, True)
 
-      #print("Pickling %d" % len(self.matrix))
-      #pickle.dump(self.matrix, open("matrix.p", "wb"))
+      print("Pickling %d things" % len(self.matrix))
+      pickle.dump(self.matrix, open("matrix.pkl", "wb"))
+
 
   def generateNextWord(self, prev_word, current_word):
 
@@ -81,17 +75,11 @@ class Markov(object):
       words.append(word)
       counts.append(count)
 
-    print words
-
     # pick one of the possibilities, with probability weighted by frequency in training corpus
     cumcounts = numpy.cumsum(counts)
-    print "cumcounts: %s" % cumcounts
     coin = numpy.random.randint(cumcounts[-1])
-    print "coin: %s" % coin
     for index, item in enumerate(cumcounts):
-      print "(%s, %s)" % (index, item)
       if item >= coin:
-        print words[index]
         return words[index]
 
 
@@ -101,8 +89,6 @@ class Markov(object):
     current_word = seed2
     paragraph = [ seed1 ]
 
-    print "CURRENTLY AT %s, %s" % (prev_word, current_word)
-
     while (current_word != '$' and len(paragraph) < 20): 
       paragraph.append(current_word)
       prev_word, current_word = current_word, self.generateNextWord( prev_word, current_word )
@@ -110,13 +96,6 @@ class Markov(object):
     paragraph = ' '.join(paragraph[1:])  # strip off leading caret
     return string.capwords(paragraph)
 
-
-  def __str__(self):
-    s = ''
-    for word, cfd in self.matrix.iteritems():
-      for word2, count in cfd.iteritems():
-        s += '%s %s: %d\n' % (word, word2, count)
-    return s
 
 def main():
 
@@ -127,7 +106,6 @@ def main():
   filename = sys.argv[1]
   
   m = Markov()
-  headlines = m.read(filename)
   m.generateMatrix(filename)
 
   while True:
@@ -135,7 +113,7 @@ def main():
     if len(tweet) < 120:
       break
 
-  print("Tweeting %s" % tweet)
+  print("Tweeting: %s" % tweet)
   twitterclient.postTweet(tweet)
 
 if __name__ == '__main__':

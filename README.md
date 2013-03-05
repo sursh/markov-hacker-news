@@ -10,9 +10,10 @@ TODO:
 - [x] Turn into Twitter bot with heroku
 - [x] fix length of tweets
 - [ ] add seed function
+
 - [ ] Implement real HN headlines
 - [ ] Implement check to make sure generated lines aren't coincidentally real ones
-- [ ] Toward the end of a sentence, transition into bigrams instead of trigrams (backoff)
-- [ ] Add links
+- [ ] Toward the end of a sentence, transition into bigrams instead of trigrams (maybe)
+- [ ] Add links (maybe)
 
-
+What is the effect of removing the probability weighting when choosing the next word?
