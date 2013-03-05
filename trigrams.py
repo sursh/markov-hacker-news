@@ -1,4 +1,4 @@
-#!/usr/bin/python -tt
+ #!/usr/bin/python -tt
 
 import sys
 import json
@@ -12,19 +12,19 @@ import twitterclient
 class Markov(object):
 
   def read(self, filename):
+
     with open(filename) as f:
-      headlines = f.readlines()
+      for line in f:
+        yield line.strip().lower().split()
 
-    headlines = map(str.lower, headlines)
-    headlines = map(str.strip, headlines)
-    headlines = [re.split('\s+', headline) for headline in headlines]
-    for headline in headlines:
-      if headline[-1] == '': del(headline[-1]) # clear lingering null entries
-      if headline[0] == '': del(headline[0])
+    # headlines = [re.split('\s+', headline) for headline in headlines]
+    #for headline in headlines:
+    #  if headline[-1] == '': del(headline[-1]) # clear lingering null entries
+    #  if headline[0] == '': del(headline[0])
 
-    headlines = [['^'] + headline + ['$'] for headline in headlines]
+    #headlines = [['^'] + headline + ['$'] for headline in headlines]
 
-    return headlines
+    #return headlines
 
   def generateTrigrams(self, tokens):
     ''' Create a list of tuples, where each tuple is a trigram '''
@@ -127,6 +127,7 @@ def main():
   filename = sys.argv[1]
   
   m = Markov()
+  headlines = m.read(filename)
   m.generateMatrix(filename)
 
   while True:
