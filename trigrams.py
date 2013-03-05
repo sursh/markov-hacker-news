@@ -28,8 +28,6 @@ class Markov(object):
 
   def generateTrigrams(self, tokens):
     ''' Create a list of tuples, where each tuple is a trigram '''
-    
-    print "making trigrams"
 
     grams = []
     for idx, item in enumerate(tokens[:-2]):
@@ -79,15 +77,20 @@ class Markov(object):
 
     for word in self.bigrams[bigram]:
       trigram = bigram + (word,)
-      counts = self.matrix[trigram]
+      (count, _) = self.matrix[trigram]
       words.append(word)
-      counts.append(counts)
+      counts.append(count)
+
+    print words
 
     # pick one of the possibilities, with probability weighted by frequency in training corpus
     cumcounts = numpy.cumsum(counts)
+    print "cumcounts: %s" % cumcounts
     coin = numpy.random.randint(cumcounts[-1])
+    print "coin: %s" % coin
     for index, item in enumerate(cumcounts):
-      if item > coin:
+      print "(%s, %s)" % (index, item)
+      if item >= coin:
         print words[index]
         return words[index]
 
@@ -97,6 +100,8 @@ class Markov(object):
     prev_word = seed1
     current_word = seed2
     paragraph = [ seed1 ]
+
+    print "CURRENTLY AT %s, %s" % (prev_word, current_word)
 
     while (current_word != '$' and len(paragraph) < 20): 
       paragraph.append(current_word)
@@ -129,7 +134,7 @@ def main():
     if len(tweet) < 120:
       break
 
-  print("Tweeting %d" % tweet)
+  print("Tweeting %s" % tweet)
   twitterclient.postTweet(tweet)
 
 if __name__ == '__main__':
