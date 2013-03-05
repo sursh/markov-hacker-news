@@ -4,8 +4,7 @@ import sys
 from collections import defaultdict
 import numpy
 import string
-import cPickle as pickle
-#import twitterclient
+import twitterclient
 
 class Markov(object):
 
@@ -33,33 +32,22 @@ class Markov(object):
     self.matrix = {}
     self.bigrams = defaultdict(list)
 
-    # load matrix from pickle file
-    try: 
-      with open('matrix.pkl', 'rb') as f:
-        self.matrix = pickle.load(f)
+    headlines = self.read(filename)
 
-    # or, construct matrix from text file
-    except: 
+    for headline in headlines:
 
-      headlines = self.read(filename)
+      trigrams = self.generateTrigrams(headline)
 
-      for headline in headlines:
+      for trigram in trigrams:
+        bigram = trigram[:2]
+        current_word = trigram[-1]
 
-        trigrams = self.generateTrigrams(headline)
+        (old_count, seenBefore) = self.matrix.get(trigram, (0, False))
 
-        for trigram in trigrams:
-          bigram = trigram[:2]
-          current_word = trigram[-1]
+        if not seenBefore:
+          self.bigrams[bigram].append(current_word)
 
-          (old_count, seenBefore) = self.matrix.get(trigram, (0, False))
-
-          if not seenBefore:
-            self.bigrams[bigram].append(current_word)
-
-          self.matrix[trigram] = (1 + old_count, True)
-
-      print("Pickling %d things" % len(self.matrix))
-      #pickle.dump(self.matrix, open("matrix.pkl", "wb"))
+        self.matrix[trigram] = (1 + old_count, True)
 
 
   def generateNextWord(self, prev_word, current_word):
@@ -75,6 +63,8 @@ class Markov(object):
       words.append(word)
       counts.append(count)
 
+    if not counts: 
+      return '$'      
     # pick one of the possibilities, with probability weighted by frequency in training corpus
     cumcounts = numpy.cumsum(counts)
     coin = numpy.random.randint(cumcounts[-1])
@@ -112,7 +102,7 @@ def main():
   m.generateMatrix(filename)
 
   while True:
-    tweet = m.generateParagraph('how') # todo: new seed
+    tweet = m.generateParagraph('how') # todo: new seed 
     tweet2 = m.generateParagraph() # todo: no seed
     if len(tweet) < 120:
       break
