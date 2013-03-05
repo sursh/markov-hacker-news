@@ -3,7 +3,7 @@
 import sys
 import json
 import re
-import collections
+from collections import defaultdict
 import numpy
 import string
 import cPickle as pickle
@@ -28,6 +28,9 @@ class Markov(object):
 
   def generateTrigrams(self, tokens):
     ''' Create a list of tuples, where each tuple is a trigram '''
+    
+    print "making trigrams"
+
     grams = []
     for idx, item in enumerate(tokens[:-2]):
       grams.append((item, tokens[idx+1], tokens[idx+2]))
@@ -37,37 +40,55 @@ class Markov(object):
     ''' Run through the list of trigrams and add them to the occurence matrix '''
 
     self.matrix = {}
+    self.bigrams = defaultdict(list)
 
-    try: # load as pickle
-
+    try: # load matrix from pickle file
       with open('matrix.p', 'rb') as f:
         self.matrix = pickle.load(f)
 
-    except: # interpret file as newline separated headlines
+    except: # construct matrix from text file
 
       headlines = self.read(filename)
+
+      print "constructing matrix"
 
       for headline in headlines:
 
         trigrams = self.generateTrigrams(headline)
 
-        for first_word, second_word, third_word in trigrams:
-          self.matrix.setdefault( (first_word, second_word), collections.defaultdict(int)) 
-          self.matrix[(first_word, second_word)][third_word] += 1
+        for trigram in trigrams:
+          bigram = trigram[:2]
+          current_word = trigram[-1]
 
-      print("DUMPING %d" % len(self.matrix))
-      pickle.dump(self.matrix, open("matrix.p", "wb"))
+          (old_count, seenBefore) = self.matrix.get(trigram, (0, False))
+
+          if not seenBefore:
+            self.bigrams[bigram].append(current_word)
+
+          self.matrix[trigram] = (1 + old_count, True)
+
+      #print("Pickling %d" % len(self.matrix))
+      #pickle.dump(self.matrix, open("matrix.p", "wb"))
 
   def generateNextWord(self, prev_word, current_word):
 
-    conditional_words = self.matrix[ (prev_word, current_word) ]
-    words, counts = zip(*conditional_words.items())
+    bigram = (prev_word, current_word)
+
+    words = []
+    counts = []
+
+    for word in self.bigrams[bigram]:
+      trigram = bigram + (word,)
+      counts = self.matrix[trigram]
+      words.append(word)
+      counts.append(counts)
 
     # pick one of the possibilities, with probability weighted by frequency in training corpus
     cumcounts = numpy.cumsum(counts)
     coin = numpy.random.randint(cumcounts[-1])
     for index, item in enumerate(cumcounts):
       if item > coin:
+        print words[index]
         return words[index]
 
 
@@ -81,7 +102,6 @@ class Markov(object):
       paragraph.append(current_word)
       prev_word, current_word = current_word, self.generateNextWord( prev_word, current_word )
 
-    
     paragraph = ' '.join(paragraph[1:])  # strip off leading caret
     return string.capwords(paragraph)
 

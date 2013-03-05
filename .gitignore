@@ -5,3 +5,4 @@ build/
 hnfull.txt
 *.p
 twitterclient.py
+venv/
