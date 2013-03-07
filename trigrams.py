@@ -127,7 +127,7 @@ def main():
 
   # send to twitter
   if DEBUG: print("Tweeting: '%s'" % tweet) 
-  #twitterclient.postTweet(tweet)
+  else: twitterclient.postTweet(tweet)
 
 if __name__ == '__main__':
   main()
