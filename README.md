@@ -1,5 +1,11 @@
-markov-hacker-news
+Hacker News Markov chain generator
 ==================
+
+Generates new-to-world Hacker News headlines, trained on several years of previous headlines. It uses a [Markov chain generator]() and trigrams to produce mostly human-sounding headlines. Old bigrams version also included for comparison. 
+
+Follow the Twitter bot [here]! 
+
+By [Sasha Laundy](http://github.com/sursh) and [David Lundgren](http://github.com/maxlikely) at [Hacker School](http://hackerschool.com). 
 
 TODO: 
 
@@ -12,9 +18,8 @@ TODO:
 - [x] add seed function
 - [ ] cut off long tail of sentence seeds
 
-- [ ] Implement real HN headlines (maybe)
-- [ ] Implement check to make sure generated lines aren't coincidentally real ones (maybe)
-- [ ] Toward the end of a sentence, transition into bigrams instead of trigrams (maybe)
-- [ ] Add links (maybe)
+TODO SOMEDAY: 
 
-Curious: what is the effect of removing the probability weighting when choosing the next word?
+- [ ] Implement real HN headlines so Twitter bot is a "is this real or not?" stream
+- [ ] Implement check to make sure generated lines aren't coincidentally real ones
+- [ ] Toward the end of a sentence, transition into bigrams instead of trigrams
