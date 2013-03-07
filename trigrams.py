@@ -9,6 +9,7 @@ import twitterclient
 class Markov(object):
 
   def read(self, filename):
+    ''' Reads in training corpus text file. Cleans, splits, and adds beginning and end signifiers. '''
 
     with open(filename) as f:
       for line in f:
@@ -16,14 +17,14 @@ class Markov(object):
 
 
   def generateTrigrams(self, tokens):
-    ''' Loop through the line and store each trigram as a tuple '''
+    ''' Break headline into trigrams '''
 
-    grams = []
+    trigrams = []
 
     for idx, item in enumerate(tokens[:-2]):
-      grams.append((item, tokens[idx+1], tokens[idx+2]))
+      trigrams.append((item, tokens[idx+1], tokens[idx+2]))
     
-    return grams
+    return trigrams
 
 
   def generateMatrix(self, filename):
