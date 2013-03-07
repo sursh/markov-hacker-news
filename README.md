@@ -9,11 +9,12 @@ TODO:
 - [x] Use pickle to only generate the matrix once
 - [x] Turn into Twitter bot with heroku
 - [x] fix length of tweets
-- [ ] add seed function
+- [x] add seed function
+- [ ] cut off long tail of sentence seeds
 
-- [ ] Implement real HN headlines
-- [ ] Implement check to make sure generated lines aren't coincidentally real ones
+- [ ] Implement real HN headlines (maybe)
+- [ ] Implement check to make sure generated lines aren't coincidentally real ones (maybe)
 - [ ] Toward the end of a sentence, transition into bigrams instead of trigrams (maybe)
 - [ ] Add links (maybe)
 
-What is the effect of removing the probability weighting when choosing the next word?
+Curious: what is the effect of removing the probability weighting when choosing the next word?

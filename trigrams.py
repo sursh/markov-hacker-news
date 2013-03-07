@@ -53,7 +53,7 @@ class Markov(object):
       trigrams = self.generateTrigrams(headline)
 
       for trigram in trigrams:
-        
+
         bigram = trigram[:2]
         current_word = trigram[-1]
         (old_count, seenBefore) = self.matrix.get(trigram, (0, False))
@@ -65,6 +65,7 @@ class Markov(object):
 
 
   def generateNextWord(self, prev_word, current_word):
+    ''' Based on prev_word and current_word, returns a third word to follow '''
 
     bigram = (prev_word, current_word)
 
@@ -77,9 +78,9 @@ class Markov(object):
       words.append(word)
       counts.append(count)
 
-    if not counts: 
-      return '$'      
-    # pick one of the possibilities, with probability weighted by frequency in training corpus
+    if not counts: return '$' # aka the ending signifier
+
+    # pick ONE of the possibilities, with probability weighted by frequency in training corpus
     cumcounts = numpy.cumsum(counts)
     coin = numpy.random.randint(cumcounts[-1])
     for index, item in enumerate(cumcounts):
@@ -88,6 +89,7 @@ class Markov(object):
 
 
   def generateParagraph(self, initial_word=None):
+    ''' Generates a new headline '''
     
     if not initial_word:
         initial_word = self.generateNextWord('^', '^')
@@ -96,7 +98,7 @@ class Markov(object):
     current_word = initial_word
     paragraph = [ initial_word ]
 
-    while (current_word != '$' and len(paragraph) < 20): 
+    while (current_word != '$'): 
       paragraph.append(current_word)
       prev_word, current_word = current_word, self.generateNextWord( prev_word, current_word )
 
@@ -125,7 +127,7 @@ def main():
 
   # send to twitter
   if DEBUG: print("Tweeting: '%s'" % tweet) 
-  twitterclient.postTweet(tweet)
+  #twitterclient.postTweet(tweet)
 
 if __name__ == '__main__':
   main()
