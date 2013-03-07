@@ -92,24 +92,25 @@ class Markov(object):
 
 def main():
 
+  DEBUG = True
+
   if len(sys.argv) != 2:
-    print 'usage: ./markov.py inputFile'
+    print 'Usage: $ %s <inputFile>' % sys.argv[0]
     sys.exit(1)
 
+  # construct matrix based on input text
   filename = sys.argv[1]
-  
   m = Markov()
   m.generateMatrix(filename)
 
+  # construct new chains that will fit in a tweet
   while True:
-    tweet = m.generateParagraph('how') # todo: new seed 
-    tweet2 = m.generateParagraph() # todo: no seed
+    tweet = m.generateParagraph() 
     if len(tweet) < 120:
       break
 
-  print("Tweeting: %s" % tweet)
-  print("no seed: %s" % tweet2)
-
+  # send to twitter
+  if DEBUG: print("Tweeting: '%s'" % tweet) 
   twitterclient.postTweet(tweet)
 
 if __name__ == '__main__':
