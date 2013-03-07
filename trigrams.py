@@ -28,7 +28,20 @@ class Markov(object):
 
 
   def generateMatrix(self, filename):
-    ''' Run through the list of trigrams and add them to the occurence matrix '''
+    ''' Run through the list of trigrams and add them to the occurence matrix.
+
+        There are two data structures here: 
+
+        1) bigrams
+           keys: tuple of first two words in each trigram
+           values: list of all the words that come third in the training corpus
+           e.g. {(a, b): (c1, c2, c3), (b, c1): (d1, d2, d3)}
+
+        2) matrix
+           keys: tuple of each trigram
+           values: tuple of # of occurences of the trigram, and a boolean seenBefore? flag
+           e.g. {(a, b, c): (5, True), (b, c, d): (2: True) ... }
+    '''
 
     self.matrix = {}
     self.bigrams = defaultdict(list)
@@ -40,9 +53,9 @@ class Markov(object):
       trigrams = self.generateTrigrams(headline)
 
       for trigram in trigrams:
+        
         bigram = trigram[:2]
         current_word = trigram[-1]
-
         (old_count, seenBefore) = self.matrix.get(trigram, (0, False))
 
         if not seenBefore:
